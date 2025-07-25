@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Link } from 'react-router-dom';
+import '../styles/Form.css'; 
 
 const API_URL = `${import.meta.env.VITE_API_BASE_URL}/users/`;
 
@@ -8,58 +9,71 @@ function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setLoading(true);
+    setError('');
 
     try {
-      const response = await axios.post(API_URL, { name, email, password });
+      await axios.post(API_URL, { name, email, password });
       
-      console.log('Usuário cadastrado com sucesso!', response.data);
-      alert('Cadastro realizado com sucesso!');
+      alert('Cadastro realizado com sucesso! Agora você pode fazer o login.');
+      navigate('/login'); 
 
-    } catch (error) {
-      if (error.response) {
-        console.error('Ocorreu um erro no cadastro:', error.response.data);
-        alert(`Erro no cadastro: ${error.response.data.detail}`);
-      } else if (error.request) {
-        console.error('Erro de rede:', error.message);
-        alert('Não foi possível conectar ao servidor. Verifique se a API está rodando.');
+    } catch (err) {
+      if (err.response && err.response.status === 400) {
+        setError('Este e-mail já está cadastrado.');
       } else {
-        console.error('Erro:', error.message);
-        alert('Ocorreu um erro inesperado.');
+        setError('Ocorreu um erro. Tente novamente mais tarde.');
       }
+      console.error(err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', flexDirection: 'column' }}>
-      <h2>Página de Cadastro</h2>
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '300px' }}>
+    <div className="form-container">
+      <form onSubmit={handleSubmit} className="form-box">
+        <h2>Página de Cadastro</h2>
+
         <input
           type="text"
           placeholder="Nome"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+          required
         />
         <input
           type="email"
           placeholder="E-mail"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+          required
         />
         <input
           type="password"
           placeholder="Senha"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+          minLength={6} 
+          required
         />
-        <button type="submit" style={{ padding: '10px', borderRadius: '5px', border: 'none', backgroundColor: '#007bff', color: 'white', cursor: 'pointer' }}>
-          Cadastrar
+        
+        {error && <p className="error-message">{error}</p>}
+        
+        <button type="submit" disabled={loading}>
+          {loading ? 'Cadastrando...' : 'Cadastrar'}
         </button>
+
+        <p className="form-footer">
+          Já tem uma conta? <Link to="/login">Faça login</Link>
+        </p>
       </form>
     </div>
   );
