@@ -1,10 +1,9 @@
-// frontend/src/App.jsx
-
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import DashboardLayout from './layouts/DashboardLayout';
+import UsersPage from './pages/UsersPage';
 
 function ProtectedRoute() {
   const token = localStorage.getItem('accessToken');
@@ -25,6 +24,7 @@ function App() {
         {/* Rotas protegidas aninhadas */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/users" element={<UsersPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/login" />} />

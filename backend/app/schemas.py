@@ -20,3 +20,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     email: Union[str, None] = None
+
+class UserUpdate(BaseModel):
+    name: str
+    email: EmailStr

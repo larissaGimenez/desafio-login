@@ -1,3 +1,5 @@
+# backend/app/main.py
+
 from fastapi import FastAPI, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -20,11 +22,10 @@ app.add_middleware(
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"], 
+    allow_headers=["*"],
 )
 
 # --- DEPENDÊNCIAS ---
-
 def get_db():
     db = SessionLocal()
     try:
@@ -52,9 +53,7 @@ def get_current_user(token: str = Depends(auth.oauth2_scheme), db: Session = Dep
         raise credentials_exception
     return user
 
-
 # --- ENDPOINTS ---
-
 @app.post("/token", response_model=schemas.Token)
 def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = crud.get_user_by_email(db, email=form_data.username)
@@ -76,6 +75,19 @@ def create_user_endpoint(user: schemas.UserCreate, db: Session = Depends(get_db)
 @app.get("/users/me/", response_model=schemas.User)
 def read_users_me(current_user: models.User = Depends(get_current_user)):
     return current_user
+
+@app.get("/users/", response_model=list[schemas.User])
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    users = crud.get_users(db, skip=skip, limit=limit)
+    return users
+
+@app.put("/users/{user_id}", response_model=schemas.User)
+def update_user_endpoint(user_id: int, user_update: schemas.UserUpdate, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    return crud.update_user(db=db, user_id=user_id, name=user_update.name, email=user_update.email)
+
+@app.delete("/users/{user_id}", response_model=schemas.User)
+def delete_user_endpoint(user_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(get_current_user)):
+    return crud.delete_user(db=db, user_id=user_id)
 
 @app.get("/")
 def read_root():
