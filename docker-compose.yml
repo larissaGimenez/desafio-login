@@ -9,5 +9,14 @@ services:
     env_file:
       - ./backend/.env
 
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
 volumes:
   db_data:
