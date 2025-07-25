@@ -1,0 +1,13 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - db_data:/data
+    env_file:
+      - ./backend/.env
+
+volumes:
+  db_data:
