@@ -11,7 +11,7 @@ Este projeto implementa uma API de login simples com FastAPI e Docker, e um fron
 
 1.  **Clone o repositório:**
     ```bash
-    git clone <url-do-seu-repositorio>
+    git clone https://github.com/larissaGimenez/desafio-login
     cd desafio-login
     ```
 
